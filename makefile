@@ -32,7 +32,6 @@ UNAME := $(shell uname)
 ifeq ($(UNAME), Darwin) # macOS
     # Add Mac-specific flags or configurations if needed
     LDFLAGS=-framework Carbon -framework OpenGL -framework GLUT
-    CXXFLAGS += -DMACOSX -DGL_SILENCE_DEPRECATION -DLO_RES_USE_OPENGL
     CXX := clang++
 else ifeq ($(OS), Windows_NT) # Windows
     # Add Windows-specific flags or configurations if needed
