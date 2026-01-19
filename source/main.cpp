@@ -10,7 +10,7 @@
 void print_help()
 {
   std::cout << R"(atlas -- texture atlas tool -- juliet colman 2026
-atlas replace <src> <dest> <cx> <cy> <c> [--force] [--overwrite]
+atlas replace <src> <dest> <cx> <cy> <c> [--force] [--overwrite] [--mask]
   Replaces one cell in destination atlas image.
   src: source image png filename
   dest: destination image png filename
@@ -19,6 +19,7 @@ atlas replace <src> <dest> <cx> <cy> <c> [--force] [--overwrite]
   c: cell to replace [0 .. cx * cy)
   --force: continue despite misgivings
   --overwrite: overwrite destination image
+  --mask: convert image into a mask (RBG->alpha)
 )";
 }
 

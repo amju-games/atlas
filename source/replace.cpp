@@ -5,13 +5,14 @@
 #include <blend.h>
 #include <sprite_sheet.h>
 #include "commandline.h"
+#include "mask_decorator.h"
 #include "replace.h"
 #include "save.h"
 
 namespace replace
 {
 bool replace_check_params(
-  commandline& cl, int& cx, int& cy, int& cell, bool& force, bool& overwrite);
+  commandline& cl, int& cx, int& cy, int& cell, bool& force, bool& overwrite, bool& mask);
 
 bool check_load_image(p_image image, const std::string& filename);
 
@@ -29,8 +30,9 @@ bool replace(commandline& cl)
   int cell = 0;
   bool force = false;
   bool overwrite = false;
+  bool mask = false;
 
-  if (!replace_check_params(cl, cx, cy, cell, force, overwrite))
+  if (!replace_check_params(cl, cx, cy, cell, force, overwrite, mask))
   {
     return false;
   }
@@ -52,23 +54,35 @@ bool replace(commandline& cl)
   {
     return false;
   }
-  do_replace(src_image, dest_image, cx, cy, cell);
+
+  // If mask flag is true, wrap a decorator around the source image
+  auto src = mask ? std::static_pointer_cast<image>(
+    std::make_shared<mask_decorator>(src_image)) : 
+    std::static_pointer_cast<image>(src_image);
+
+  do_replace(src, dest_image, cx, cy, cell);
 
   return save::save_file(dest_image, *cl.get(3), overwrite);
 }
 
-bool replace_check_params(
-  commandline& cl, int& cx, int& cy, int& cell, bool& force, bool& overwrite)
+bool check_flag(commandline& cl, const std::string& flag)
 {
-  force = cl.contains("--force");
-  cl.remove_string("--force");
+  bool ret = cl.contains(flag);
+  cl.remove_string(flag);
+  return ret;
+}
 
-  overwrite = cl.contains("--overwrite");
-  cl.remove_string("--overwrite");
+bool replace_check_params(
+  commandline& cl, int& cx, int& cy, int& cell, bool& force, bool& overwrite, bool& mask)
+{
+  force = check_flag(cl, "--force");
+  overwrite = check_flag(cl, "--overwrite");
+  mask = check_flag(cl, "--mask");
 
-  if (cl.num_strings() < 7)
+  // With flags removed, there should be 7 params.
+  if (cl.num_strings() != 7)
   {
-    std::cout << "Missing params for replace.\n";
+    std::cout << "Bad number of params for replace.\n";
     return false;
   }
   auto opt_cx = cl.get<int>(4);
