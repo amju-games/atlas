@@ -65,13 +65,6 @@ bool replace(commandline& cl)
   return save::save_file(dest_image, *cl.get(3), overwrite);
 }
 
-bool check_flag(commandline& cl, const std::string& flag)
-{
-  bool ret = cl.contains(flag);
-  cl.remove_string(flag);
-  return ret;
-}
-
 bool replace_check_params(
   commandline& cl, int& cx, int& cy, int& cell, bool& force, bool& overwrite, bool& mask)
 {

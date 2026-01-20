@@ -51,3 +51,12 @@ private:
   strvec m_strings;
 };
 
+// Check if a flag exists in the command-line input, then remove it, so
+//  the positions and number of the mandatory params don't vary.
+inline bool check_flag(commandline& cl, const std::string& flag)
+{
+  bool ret = cl.contains(flag);
+  cl.remove_string(flag);
+  return ret;
+}
+
