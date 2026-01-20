@@ -2,6 +2,7 @@
 // Juliet Colman 2026
 
 #include <iostream>
+#include <filesystem>
 #include "save.h"
 
 namespace save
@@ -9,7 +10,7 @@ namespace save
 bool save_file(std::shared_ptr<image_32> dest_image, std::string filename,
   bool overwrite)
 {
-  if (!overwrite)
+  if (!overwrite && std::filesystem::exists(filename))
   {
     // Remove ".png" from filename
     filename.erase(
