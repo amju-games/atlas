@@ -1,0 +1,55 @@
+# atlas - NMake version for Windows (MSVC)
+# Copyright (C) 2026 Juliet Colman 
+
+# --- Include the generated source list ---
+!IF EXIST(sources.inc)
+!INCLUDE sources.inc
+!ELSE
+!MESSAGE sources.inc not found. Run gen_sources_atlas.bat first.
+!ENDIF
+
+# --- Project Paths ---
+SRCDIR   = source
+BUILDDIR = build
+OBJDIR   = $(BUILDDIR)\obj
+
+# --- Dependency: lo-res library ---
+LO_RES          = ..\lo-res
+LO_RES_INC      = $(LO_RES)\include
+# Pointing to the .lib file built in the previous step
+LO_RES_LIB      = $(LO_RES)\build\lores.lib
+
+# --- Target ---
+TARGET = $(BUILDDIR)\atlas.exe
+
+# --- Compiler & Flags ---
+CXX = cl
+# /I for the lo-res headers
+CXXFLAGS = /nologo /EHsc /std:c++20 /W4 /I$(LO_RES_INC) /D_CRT_SECURE_NO_WARNINGS
+
+# --- Rules ---
+
+all: setup $(TARGET)
+
+# Ensure build directories exist
+setup:
+	@if not exist $(BUILDDIR) mkdir $(BUILDDIR)
+	@if not exist $(OBJDIR) mkdir $(OBJDIR)
+
+# Linking the executable
+# $** represents all dependents (the object files)
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) /Fe$@ $** $(LO_RES_LIB) /link /SUBSYSTEM:CONSOLE
+
+# Inference rule: compile source\*.cpp into build\obj\*.obj
+{$(SRCDIR)}.cpp{$(OBJDIR)}.obj:
+	$(CXX) $(CXXFLAGS) /c /Fo$@ $<
+
+clean:
+	@if exist $(BUILDDIR) rmdir /s /q $(BUILDDIR)
+	@if exist sources.inc del sources.inc
+
+run:
+	$(TARGET)
+
+.PHONY: all clean setup run
